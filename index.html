@@ -168,11 +168,158 @@
     }
     .portrait-orbit { animation: orbit 28s linear infinite; transform-origin: center; }
     @keyframes orbit { to { transform: rotate(360deg); } }
+    /* Event-mode controls stay above the falling-bubble layer. */
+    .tribute-controls {
+      position: fixed;
+      z-index: 70;
+      right: max(16px, env(safe-area-inset-right));
+      bottom: max(18px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 9px;
+    }
+    .tribute-button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid rgba(100, 255, 218, 0.32);
+      border-radius: 999px;
+      padding: 0 16px;
+      color: #d7fff4;
+      background: rgba(17, 34, 64, 0.94);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3);
+      font-size: 0.78rem;
+      font-weight: 600;
+      backdrop-filter: blur(14px);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      cursor: pointer;
+    }
+    .tribute-button:hover { transform: translateY(-2px); border-color: var(--cyan); }
+    .tribute-button[aria-pressed="true"] { border-color: rgba(100, 255, 218, 0.7); background: rgba(18, 60, 67, 0.96); }
+    .tribute-button--audio { min-height: 38px; color: #b7c5df; border-color: rgba(136, 146, 176, 0.25); font-size: 0.73rem; }
+    .tribute-button--audio[aria-pressed="true"] { color: var(--cyan); }
+    .tribute-status {
+      max-width: min(320px, calc(100vw - 32px));
+      border: 1px solid rgba(136, 146, 176, 0.16);
+      border-radius: 9px;
+      padding: 8px 11px;
+      color: #c3cee6;
+      background: rgba(10, 25, 47, 0.94);
+      font-size: 0.7rem;
+      line-height: 1.45;
+      text-align: right;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    .tribute-bubble-layer {
+      position: fixed;
+      z-index: 40;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .tribute-bubble {
+      position: absolute;
+      top: -76px;
+      display: grid;
+      width: var(--bubble-size);
+      height: var(--bubble-size);
+      padding: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      color: #fff3fa;
+      background: transparent;
+      font-size: calc(var(--bubble-size) * 0.83);
+      line-height: 1;
+      cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      filter: drop-shadow(0 5px 13px rgba(100, 168, 255, 0.18));
+      animation: tribute-fall var(--fall-duration) linear forwards;
+    }
+    .tribute-bubble--orb {
+      border: 1px solid rgba(231, 248, 255, 0.88);
+      background:
+        radial-gradient(ellipse at 29% 21%, rgba(255,255,255,.96) 0 3%, rgba(255,255,255,.55) 5%, transparent 20%),
+        radial-gradient(circle at 70% 76%, rgba(100,168,255,.24), transparent 58%),
+        linear-gradient(135deg, rgba(255,255,255,.46), rgba(160,220,255,.08) 48%, rgba(247,188,220,.25));
+      box-shadow: inset -5px -7px 12px rgba(134, 174, 218, 0.13), 0 0 16px rgba(206, 241, 255, 0.2);
+    }
+    .tribute-bubble--orb::after {
+      width: 73%;
+      height: 73%;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      content: "";
+      transform: rotate(-24deg) scaleX(.86);
+    }
+    .tribute-bubble.is-popping { pointer-events: none; animation: tribute-pop 180ms ease-out forwards; }
+    .tribute-particle {
+      position: fixed;
+      z-index: 60;
+      width: var(--particle-size);
+      height: var(--particle-size);
+      border-radius: var(--particle-radius, 50%);
+      background: var(--particle-color);
+      pointer-events: none;
+      animation: tribute-burst 680ms cubic-bezier(.15,.65,.3,1) forwards;
+    }
+    .tribute-toast {
+      position: fixed;
+      z-index: 65;
+      width: min(340px, calc(100vw - 32px));
+      border: 1px solid rgba(100, 255, 218, 0.2);
+      border-radius: 16px;
+      padding: 16px 19px;
+      color: #e2ecff;
+      background: rgba(17, 34, 64, 0.96);
+      box-shadow: 0 16px 46px rgba(0, 0, 0, 0.34);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      text-align: center;
+      pointer-events: none;
+      backdrop-filter: blur(14px);
+      animation: tribute-toast 3.4s ease-out forwards;
+    }
+    .tribute-toast::before {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--cyan);
+      content: "✦  Lời tri ân 20/11  ✦";
+      font: 600 0.65rem "DM Mono", monospace;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    @keyframes tribute-fall {
+      0% { transform: translate3d(0, -8vh, 0) rotate(0deg); }
+      28% { transform: translate3d(var(--sway), 27vh, 0) rotate(80deg); }
+      63% { transform: translate3d(calc(var(--sway) * -0.5), 66vh, 0) rotate(210deg); }
+      100% { transform: translate3d(var(--drift), 112vh, 0) rotate(360deg); }
+    }
+    @keyframes tribute-pop { to { opacity: 0; transform: scale(1.7) rotate(18deg); } }
+    @keyframes tribute-burst {
+      to { opacity: 0; transform: translate(var(--move-x), var(--move-y)) rotate(var(--turn)) scale(.3); }
+    }
+    @keyframes tribute-toast {
+      0% { opacity: 0; transform: translate(-50%, 12px) scale(.93); }
+      12% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      76% { opacity: 1; transform: translate(-50%, -24px) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50px) scale(.97); }
+    }
     @media (max-width: 767px) {
       .section-shell { width: min(100% - 2rem, 1100px); }
       .section-heading { margin-bottom: 30px; }
       #mobile-nav[data-open="false"] { display: none; }
       #mobile-nav[data-open="true"] { display: flex; }
+      .tribute-controls { right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); gap: 7px; }
+      .tribute-button { min-height: 42px; padding-inline: 13px; font-size: 0.72rem; }
+      .tribute-button--audio { min-height: 36px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -182,6 +329,7 @@
         transition-duration: 0.01ms !important;
       }
       .reveal { opacity: 1; transform: none; }
+      .tribute-bubble, .tribute-toast, .tribute-particle { animation-duration: 0.01ms !important; }
     }
   </style>
 </head>
@@ -559,6 +707,18 @@
     </div>
   </footer>
 
+  <!-- Tribute controls are separate from the portfolio content and can be used independently. -->
+  <div class="tribute-controls" aria-label="20 November tribute mode controls">
+    <p id="tribute-status" class="tribute-status" role="status" aria-live="polite">Tri ân 20/11 đang tắt. Nhạc chỉ phát khi bạn chủ động bật.</p>
+    <button id="tribute-toggle" class="tribute-button" type="button" aria-pressed="false">
+      <span aria-hidden="true">🎈</span><span id="tribute-label">Bật chế độ Tri Ân 20/11</span>
+    </button>
+    <button id="tribute-audio-toggle" class="tribute-button tribute-button--audio" type="button" aria-pressed="false" aria-label="Bật nhạc tri ân">
+      <span aria-hidden="true">♫</span><span id="tribute-audio-label">Bật nhạc tri ân</span>
+    </button>
+  </div>
+  <div id="tribute-bubble-layer" class="tribute-bubble-layer" aria-label="Bong bóng lời chúc 20/11"></div>
+
   <script>
     // Mobile navigation: keep the menu keyboard- and screen-reader-friendly.
     const menuToggle = document.getElementById("menu-toggle");
@@ -676,6 +836,234 @@
     });
 
     document.getElementById("current-year").textContent = new Date().getFullYear();
+
+    // Chỉnh sửa danh sách lời chúc tại đây để thay đổi thông điệp 20/11.
+    const tributeWishes = [
+      "Tri ân những người gieo mầm tri thức và thắp sáng tương lai!",
+      "Kính chúc thầy cô luôn dồi dào sức khỏe, nhiệt huyết và hạnh phúc!",
+      "Cảm ơn thầy cô và những người dẫn dắt đã luôn kiên nhẫn đồng hành.",
+      "Kính chúc những người lái đò luôn vững tay chèo và đầy ắp niềm vui.",
+      "Mỗi bài học và sự tận tâm của thầy cô sẽ luôn được chúng em trân quý.",
+      "Chúc thầy cô luôn giữ ngọn lửa đam mê và gặt hái nhiều thành công.",
+      "Tri ân những người mở lối, truyền cảm hứng và giúp bao ước mơ bay xa.",
+      "Kính chúc thầy cô một ngày 20/11 ấm áp, bình an và ngập tràn yêu thương.",
+      "Cảm ơn vì đã trao tri thức, niềm tin và động lực cho thế hệ mai sau.",
+      "Chúc những người thầy, người cô và mentor luôn được yêu thương, trân trọng!"
+    ];
+
+    // Nhạc được tạo nhẹ nhàng bằng Web Audio API, không phụ thuộc MP3 hoặc dịch vụ bên ngoài.
+    const tributeBubbleLayer = document.getElementById("tribute-bubble-layer");
+    const tributeToggle = document.getElementById("tribute-toggle");
+    const tributeLabel = document.getElementById("tribute-label");
+    const tributeAudioToggle = document.getElementById("tribute-audio-toggle");
+    const tributeAudioLabel = document.getElementById("tribute-audio-label");
+    const tributeStatus = document.getElementById("tribute-status");
+    const tributeMaxBubbles = 24;
+    const tributeBubbleShapes = [
+      { type: "orb", content: "" },
+      { type: "icon", content: '<svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><path d="M24 41S5 29 5 16C5 6 18 4 24 15 30 4 43 6 43 16c0 13-19 25-19 25Z" fill="#ff91b5" stroke="#ffe0eb" stroke-width="2"/></svg>' },
+      { type: "icon", content: '<svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><path d="m24 3 5.2 13.2L43 17l-10.6 8.8L36 40l-12-7.5L12 40l3.6-14.2L5 17l13.8-.8L24 3Z" fill="#ffe08a" stroke="#fff4ce" stroke-width="2" stroke-linejoin="round"/></svg>' },
+      { type: "icon", content: '<svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><g fill="#e7a9ff" stroke="#ffe5ff" stroke-width="1.5"><ellipse cx="24" cy="12" rx="6" ry="10"/><ellipse cx="24" cy="36" rx="6" ry="10"/><ellipse cx="12" cy="24" rx="10" ry="6"/><ellipse cx="36" cy="24" rx="10" ry="6"/></g><circle cx="24" cy="24" r="6" fill="#ffe08a"/></svg>' },
+      { type: "icon", content: '<svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true"><path d="M5 10c8-3 14-1 19 3v27c-5-4-11-6-19-3V10Zm38 0c-8-3-14-1-19 3v27c5-4 11-6 19-3V10Z" fill="#b9ddff" stroke="#eef8ff" stroke-width="2" stroke-linejoin="round"/><path d="M10 17c4-1 7 0 10 2M10 23c4-1 7 0 10 2m18-8c-4-1-7 0-10 2m10 4c-4-1-7 0-10 2" stroke="#7299cb" stroke-width="1.5" stroke-linecap="round"/></svg>' }
+    ];
+    const tributeParticleColors = ["#64ffda", "#ffe08a", "#ff91b5", "#9ac8ff", "#d7b4ff", "#f4f7ff"];
+    let tributeActive = false;
+    let tributeSpawnTimer = null;
+    let tributeAudioContext = null;
+    let tributeMusicTimer = null;
+    let tributeMusicStep = 0;
+    let tributeAudioEnabled = false;
+
+    function randomBetween(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function setTributeStatus(message) {
+      tributeStatus.textContent = message;
+    }
+
+    function createTributeBubble() {
+      if (!tributeActive || tributeBubbleLayer.childElementCount >= tributeMaxBubbles) return;
+
+      const shape = tributeBubbleShapes[Math.floor(Math.random() * tributeBubbleShapes.length)];
+      const size = Math.round(randomBetween(36, 62));
+      const bubble = document.createElement("button");
+      bubble.type = "button";
+      bubble.className = `tribute-bubble ${shape.type === "orb" ? "tribute-bubble--orb" : ""}`;
+      bubble.style.left = `${randomBetween(1, 96)}vw`;
+      bubble.style.setProperty("--bubble-size", `${size}px`);
+      bubble.style.setProperty("--fall-duration", `${randomBetween(9, 16)}s`);
+      bubble.style.setProperty("--sway", `${randomBetween(-90, 90)}px`);
+      bubble.style.setProperty("--drift", `${randomBetween(-115, 115)}px`);
+      bubble.setAttribute("aria-label", "Chạm để nhận lời chúc tri ân 20/11");
+      bubble.title = "Chạm để nhận lời chúc";
+      if (shape.content) bubble.innerHTML = shape.content;
+
+      bubble.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        popTributeBubble(bubble, event.clientX, event.clientY);
+      }, { once: true });
+      bubble.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          const rect = bubble.getBoundingClientRect();
+          popTributeBubble(bubble, rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+      });
+      bubble.addEventListener("animationend", (event) => {
+        if (event.animationName === "tribute-fall") bubble.remove();
+      }, { once: true });
+      tributeBubbleLayer.appendChild(bubble);
+    }
+
+    function createTributeParticles(x, y) {
+      for (let index = 0; index < 14; index += 1) {
+        const particle = document.createElement("span");
+        const angle = Math.PI * 2 * index / 14 + randomBetween(-0.18, 0.18);
+        const distance = randomBetween(30, 86);
+        particle.className = "tribute-particle";
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        particle.style.setProperty("--move-x", `${Math.cos(angle) * distance}px`);
+        particle.style.setProperty("--move-y", `${Math.sin(angle) * distance}px`);
+        particle.style.setProperty("--turn", `${randomBetween(-250, 250)}deg`);
+        particle.style.setProperty("--particle-size", `${randomBetween(5, 10)}px`);
+        particle.style.setProperty("--particle-color", tributeParticleColors[Math.floor(Math.random() * tributeParticleColors.length)]);
+        particle.style.setProperty("--particle-radius", Math.random() > 0.5 ? "2px" : "50%");
+        particle.addEventListener("animationend", () => particle.remove(), { once: true });
+        document.body.appendChild(particle);
+      }
+    }
+
+    function showTributeWish(x, y) {
+      const toast = document.createElement("div");
+      toast.className = "tribute-toast";
+      toast.setAttribute("role", "status");
+      toast.textContent = tributeWishes[Math.floor(Math.random() * tributeWishes.length)];
+      toast.style.left = `${Math.max(170, Math.min(window.innerWidth - 170, x))}px`;
+      toast.style.top = `${Math.max(100, Math.min(window.innerHeight - 130, y - 25))}px`;
+      toast.addEventListener("animationend", () => toast.remove(), { once: true });
+      document.body.appendChild(toast);
+    }
+
+    async function playTributePop() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      try {
+        if (!tributeAudioContext) tributeAudioContext = new AudioContextClass();
+        if (tributeAudioContext.state === "suspended") await tributeAudioContext.resume();
+
+        const now = tributeAudioContext.currentTime;
+        const oscillator = tributeAudioContext.createOscillator();
+        const gain = tributeAudioContext.createGain();
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(620, now);
+        oscillator.frequency.exponentialRampToValueAtTime(175, now + 0.13);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.13, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
+        oscillator.connect(gain);
+        gain.connect(tributeAudioContext.destination);
+        oscillator.start(now);
+        oscillator.stop(now + 0.18);
+      } catch (error) {
+        setTributeStatus("Trình duyệt không thể phát hiệu ứng âm thanh. Bong bóng vẫn hoạt động bình thường.");
+      }
+    }
+
+    function popTributeBubble(bubble, x, y) {
+      if (!bubble.isConnected || bubble.classList.contains("is-popping")) return;
+      bubble.classList.add("is-popping");
+      createTributeParticles(x, y);
+      showTributeWish(x, y);
+      playTributePop();
+      window.setTimeout(() => bubble.remove(), 200);
+    }
+
+    function setTributeMode(enabled) {
+      tributeActive = enabled;
+      tributeToggle.setAttribute("aria-pressed", String(enabled));
+      tributeLabel.textContent = enabled ? "Tắt chế độ Tri Ân 20/11" : "Bật chế độ Tri Ân 20/11";
+      if (enabled) {
+        createTributeBubble();
+        tributeSpawnTimer = window.setInterval(createTributeBubble, 680);
+        setTributeStatus("Chế độ Tri Ân đang bật — chạm vào bong bóng để khám phá lời chúc.");
+      } else {
+        window.clearInterval(tributeSpawnTimer);
+        tributeSpawnTimer = null;
+        tributeBubbleLayer.replaceChildren();
+        setTributeStatus("Chế độ Tri Ân đã tắt. Bạn có thể bật lại bất cứ lúc nào.");
+      }
+    }
+
+    tributeToggle.addEventListener("click", () => setTributeMode(!tributeActive));
+
+    // Giai điệu pentatonic dịu nhẹ được tổng hợp tại chỗ, không tải nhạc từ bên thứ ba.
+    const tributeMelody = [523.25, 659.25, 783.99, 659.25, 587.33, 659.25, 523.25, 392.00, 440.00, 523.25, 659.25, 523.25, 493.88, 440.00, 392.00, 0];
+
+    function playTributeNote(frequency, startTime, duration) {
+      if (!frequency || !tributeAudioContext || !tributeAudioEnabled) return;
+      const oscillator = tributeAudioContext.createOscillator();
+      const gain = tributeAudioContext.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(frequency, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.035, startTime + 0.045);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      oscillator.connect(gain);
+      gain.connect(tributeAudioContext.destination);
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration + 0.02);
+    }
+
+    function scheduleTributeMelody() {
+      if (!tributeAudioEnabled || !tributeAudioContext) return;
+      playTributeNote(tributeMelody[tributeMusicStep], tributeAudioContext.currentTime, 0.42);
+      if (tributeMusicStep % 4 === 0) {
+        playTributeNote(tributeMelody[tributeMusicStep] / 2, tributeAudioContext.currentTime, 0.72);
+      }
+      tributeMusicStep = (tributeMusicStep + 1) % tributeMelody.length;
+    }
+
+    async function toggleTributeAudio() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        setTributeStatus("Trình duyệt này chưa hỗ trợ Web Audio. Chế độ bong bóng vẫn dùng được.");
+        return;
+      }
+
+      if (tributeAudioEnabled) {
+        tributeAudioEnabled = false;
+        window.clearInterval(tributeMusicTimer);
+        tributeMusicTimer = null;
+        tributeAudioToggle.setAttribute("aria-pressed", "false");
+        tributeAudioToggle.setAttribute("aria-label", "Bật nhạc tri ân");
+        tributeAudioLabel.textContent = "Bật nhạc tri ân";
+        if (tributeAudioContext && tributeAudioContext.state === "running") await tributeAudioContext.suspend();
+        setTributeStatus(tributeActive ? "Chế độ Tri Ân đang bật. Nhạc đã tắt." : "Nhạc tri ân đã tắt.");
+        return;
+      }
+
+      try {
+        if (!tributeAudioContext) tributeAudioContext = new AudioContextClass();
+        await tributeAudioContext.resume();
+        tributeAudioEnabled = true;
+        tributeAudioToggle.setAttribute("aria-pressed", "true");
+        tributeAudioToggle.setAttribute("aria-label", "Tắt nhạc tri ân");
+        tributeAudioLabel.textContent = "Tắt nhạc tri ân";
+        tributeMusicStep = 0;
+        scheduleTributeMelody();
+        tributeMusicTimer = window.setInterval(scheduleTributeMelody, 520);
+        setTributeStatus("Đang phát giai điệu tri ân nhẹ nhàng. Nhấn Tắt nhạc tri ân để dừng.");
+      } catch (error) {
+        tributeAudioEnabled = false;
+        tributeAudioToggle.setAttribute("aria-pressed", "false");
+        tributeAudioLabel.textContent = "Bật nhạc tri ân";
+        setTributeStatus("Không thể khởi động âm thanh. Hãy thử nhấn nút nhạc lại.");
+      }
+    }
+
+    tributeAudioToggle.addEventListener("click", toggleTributeAudio);
   </script>
 </body>
 </html>
